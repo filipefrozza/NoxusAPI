@@ -19,26 +19,13 @@ router.post('/notificacao', function(req, res, next){
     res.json(retorno);
 });
 
-router.post('/adicionar-fundos', passport.authenticate('jwt', { session: false }), (req, res) => {
-    // console.log(req);
+router.post('/comprar', passport.authenticate('jwt', {session: false}), (req, res) => {
     pagarmeController.buildTransaction(
-        [
-            {
-                "id": req.body.valor,
-                "descricao": req.body.valor+" reais de crédito",
-                "preco": req.body.valor,
-                "quantidade": 1,
-                "fisico": false
-            }
-        ], 
-        req.user, 
-        req.body.cartao, 
+        req.body.items,
+        req.user,
+        req.body.cartao,
         res
     );
-});
-
-router.get('/teste', function(req, res, next){
-    res.json({});
 });
 
 module.exports = router;

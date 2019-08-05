@@ -31,7 +31,7 @@ exports.buildTransaction = (itens, cliente, cartao, res) => {
         items.push(
             {
                 "id": itens[i].id,
-                "title": itens[i].descricao,
+                "title": itens[i].nome,
                 "unit_price": itens[i].preco*100,
                 "quantity": itens[i].quantidade,
                 "tangible": itens[i].fisico

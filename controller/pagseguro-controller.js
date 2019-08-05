@@ -14,7 +14,7 @@ exports.buildTransaction = (itens, cliente, res) => {
     for(i in itens){
         pagSeguro.addItem({
             id: itens[i].id,
-            description: itens[i].descricao,
+            description: itens[i].nome,
             amount: Number.parseFloat(itens[i].preco).toFixed(2),  // tem que ter 2 decimais no valor
             quantity: itens[i].quantidade,
             weight: itens[i].peso,   // em gramas

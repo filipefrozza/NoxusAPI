@@ -10,6 +10,8 @@ var ProdutoSchema = new mongoose.Schema({
     img: String,
     peso: Number,
     preco: Number,
+    estoque: Number,
+    descricao: String,
     habilitado: Boolean,
     updated_at: { type: Date, default: Date.now },
 });
