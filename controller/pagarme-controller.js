@@ -1,37 +1,44 @@
-exports.adicionarFundos = (valor, usuario, cartao, res) => {
-    if(!usuario){
+exports.buildTransaction = (itens, cliente, cartao, res) => {
+    if(!cliente){
         return res.status(400).json({ 'msg': 'Problemas na autenticação' });
     }
 
-    if(!valor){
-        return res.status(400).json({ 'msg': 'Você deve informar o valor' });
+    if(!itens){
+        return res.status(400).json({ 'msg': 'Você deve informar os itens' });
     }
 
     customer = {
-        "external_id": usuario._id,
-        "name": usuario.nome,
+        "external_id": cliente._id,
+        "name": cliente.nome,
         "type": "individual",
         "country": "br",
-        "email": usuario.email,
+        "email": cliente.email,
         "documents": [
             {
             "type": "cpf",
-            "number": usuario.cpf
+            "number": cliente.cpf
             }
         ],
-        "phone_numbers": ["+55"+usuario.telefone.replace(/(\(|\)|\s|\-)/g,'')],
-        "birthday": usuario.nascimento.toISOString().split('T')[0]
+        "phone_numbers": ["+55"+cliente.telefone.replace(/(\(|\)|\s|\-)/g,'')],
+        "birthday": cliente.nascimento.toISOString().split('T')[0]
     };
 
-    items = [
-        {
-            "id": valor,
-            "title": valor+" reais de crédito",
-            "unit_price": valor*100,
-            "quantity": 1,
-            "tangible": false
-        }
-    ];
+    items = [];
+
+    total = 0;
+
+    for(i in itens){
+        items.push(
+            {
+                "id": itens[i].id,
+                "title": itens[i].descricao,
+                "unit_price": itens[i].preco*100,
+                "quantity": itens[i].quantidade,
+                "tangible": itens[i].fisico
+            }
+        );
+        total+=itens[i].preco;
+    }
 
     if(cartao){
         billing = {
@@ -49,7 +56,7 @@ exports.adicionarFundos = (valor, usuario, cartao, res) => {
 
         data = {
             "payment_method": "credit_card",
-            "amount": valor*100,
+            "amount": total*100,
             "card_number": cartao.numero,
             "card_cvv": cartao.cvv,
             "card_expiration_date": cartao.expiracao,
@@ -60,21 +67,21 @@ exports.adicionarFundos = (valor, usuario, cartao, res) => {
         };
     }else{
         billing = {
-            "name": usuario.nome,
+            "name": cliente.nome,
             "address": {
                 "country": "br",
-                "state": usuario.estado,
-                "city": usuario.cidade,
-                "neighborhood": usuario.bairro,
-                "street": usuario.rua,
-                "street_number": usuario.numero,
-                "zipcode": usuario.cep.replace('-','')
+                "state": cliente.estado,
+                "city": cliente.cidade,
+                "neighborhood": cliente.bairro,
+                "street": cliente.rua,
+                "street_number": cliente.numero,
+                "zipcode": cliente.cep.replace('-','')
             }
         };
 
         data = {
             "payment_method": "boleto",
-            "amount": valor*100,
+            "amount": total*100,
             "customer": customer,
             "billing": billing,
             "items": items
@@ -83,10 +90,10 @@ exports.adicionarFundos = (valor, usuario, cartao, res) => {
 
     console.log(data);
     // res.json(data);
-    exports.createTransaction(data, res);
+    exports.sendTransaction(data, res);
 };
 
-exports.createTransaction = (transaction, res) => {
+exports.sendTransaction = (transaction, res) => {
     pagarmeAPI.client.connect({ api_key: 'ak_test_vyhjh3rc3PbxslGWfg17PgRcdQAzOR' })
     .then(client => {
         client.transactions.create(transaction)

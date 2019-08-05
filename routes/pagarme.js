@@ -20,8 +20,21 @@ router.post('/notificacao', function(req, res, next){
 });
 
 router.post('/adicionar-fundos', passport.authenticate('jwt', { session: false }), (req, res) => {
-    console.log(req);
-    pagarmeController.adicionarFundos(req.body.valor, req.user, req.body.cartao, res);
+    // console.log(req);
+    pagarmeController.buildTransaction(
+        [
+            {
+                "id": req.body.valor,
+                "descricao": req.body.valor+" reais de crédito",
+                "preco": req.body.valor,
+                "quantidade": 1,
+                "fisico": false
+            }
+        ], 
+        req.user, 
+        req.body.cartao, 
+        res
+    );
 });
 
 router.get('/teste', function(req, res, next){
