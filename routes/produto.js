@@ -12,6 +12,8 @@ router.get('/', function (req, res, next) {
     });
 });
 
+router.get('/destaques', produto.getDestaques);
+
 /* GET SINGLE TIME BY ID */
 router.get('/:id', function (req, res, next) {
     Produto.findById(req.params.id, function (err, produto) {

@@ -28,7 +28,7 @@ var hostname = os.hostname();
 
 module.exports = {
     jwtSecret: 'brazilian-bet-api',
-    db: 'mongodb://localhost/brazilianbet',
+    db: 'mongodb://localhost/noxusapi',
     // getPagseguro: getPagseguro,
     hostname: hostname
 };

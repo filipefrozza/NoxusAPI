@@ -29,7 +29,7 @@ global.pagarmeAPI = require('pagarme');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://localhost/brazilianbet')
+mongoose.connect(config.db)
   .then(() =>  console.log('connection successful'))
   .catch((err) => console.error(err));
 
