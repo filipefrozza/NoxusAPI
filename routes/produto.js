@@ -2,9 +2,9 @@ var express = require('express');
 var router = express.Router();
 var produto = require('../controller/produto-controller');
 var Produto = require('../models/Produto');
-var Cliente = require('../models/Cliente');
+var passport     = require('passport');
+var requireAdmin = require('../middleware/requireAdmin');
 
-/* GET ALL TIME */
 router.get('/', function (req, res, next) {
     Produto.find(function (err, produtos) {
         if (err) return next(err);
@@ -14,7 +14,6 @@ router.get('/', function (req, res, next) {
 
 router.get('/destaques', produto.getDestaques);
 
-/* GET SINGLE TIME BY ID */
 router.get('/:id', function (req, res, next) {
     Produto.findById(req.params.id, function (err, produto) {
         if (err) return next(err);
@@ -22,29 +21,30 @@ router.get('/:id', function (req, res, next) {
     });
 });
 
+router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+    if(requireAdmin(req, res)){
+        produto.save(req, res);
+    }
+});
 
-/* SAVE TIME */
-// router.post('/', function (req, res, next) {
-//     Time.create(req.body, function (err, post) {
-//         if (err) return next(err);
-//         res.json(post);
-//     });
-// });
+router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+    if(requireAdmin(req, res)){
+        produto.save(req, res);
+    }
+});
 
 /* UPDATE TIME */
-// router.put('/:id', function (req, res, next) {
-//     Time.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-//         if (err) return next(err);
-//         res.json(post);
-//     });
-// });
+router.put('/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+    if(requireAdmin(req, res)){
+        produto.update(req, res);
+    }
+});
 
 /* DELETE TIME */
-// router.delete('/:id', function (req, res, next) {
-//     Time.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-//         if (err) return next(err);
-//         res.json(post);
-//     });
-// });
+router.delete('/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+    if(requireAdmin(req, res)){
+        produto.delete(req, res);
+    }
+});
 
 module.exports = router;

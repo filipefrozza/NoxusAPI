@@ -1,4 +1,4 @@
-var Cliente        = require('../models/Cliente');
+var Usuario        = require('../models/Usuario');
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt  = require('passport-jwt').ExtractJwt;
  
@@ -8,12 +8,12 @@ var opts = {
 }
  
 module.exports = new JwtStrategy(opts, function (jwt_payload, done) {
-    Cliente.findById(jwt_payload.id, function (err, cliente) {
+    Usuario.findById(jwt_payload.id, function (err, usuario) {
         if (err) {
             return done(err, false);
         }
-        if (cliente) {
-            return done(null, cliente);
+        if (usuario) {
+            return done(null, usuario);
         } else {
             return done(null, false);
         }

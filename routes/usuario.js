@@ -1,6 +1,6 @@
 var express         = require('express'),
     routes          = express.Router();
-var clienteController  = require('../controller/cliente-controller');
+var usuarioController  = require('../controller/usuario-controller');
 var passport     = require('passport');
 const path = require("path");
 const multer = require("multer");
@@ -21,13 +21,13 @@ routes.get('/', (req, res) => {
     return res.send('[]');
 });
  
-routes.post('/register', clienteController.register);
+routes.post('/register', usuarioController.register);
 
 routes.put('/edit', passport.authenticate('jwt', { session: false }), (req, res) => {
-    clienteController.editPerfil(req, res);
+    usuarioController.editPerfil(req, res);
 });
 
-routes.post('/login', clienteController.login);
+routes.post('/login', usuarioController.login);
  
 routes.get('/check', passport.authenticate('jwt', { session: false }), (req, res) => {
     // return res.json({ msg: `${req.user.usuario} você está logado.` });
@@ -48,10 +48,10 @@ routes.post("/upload", (req, res) => {
     });
 });
 
-routes.post('/forgot', clienteController.forgotPassword);
+routes.post('/forgot', usuarioController.forgotPassword);
 
-routes.post('/check-token', clienteController.checkForgotToken);
+routes.post('/check-token', usuarioController.checkForgotToken);
 
-routes.post('/reset', clienteController.resetForgotPassword);
+routes.post('/reset', usuarioController.resetForgotPassword);
  
 module.exports = routes;

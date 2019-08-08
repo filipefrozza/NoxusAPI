@@ -17,7 +17,7 @@ var passport = require('passport');
 var nodemailer = require('nodemailer');
 
 var index = require('./routes/index');
-var cliente = require('./routes/cliente');
+var usuario = require('./routes/usuario');
 var produto = require('./routes/produto');
 var pagseguro = require('./routes/pagseguro');
 var pagarme = require('./routes/pagarme');
@@ -54,7 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
 app.use('/', index);
-app.use('/api/v1/cliente', cliente);
+app.use('/api/v1/usuario', usuario);
 app.use('/api/v1/produto', produto);
 app.use('/api/v1/pagseguro', pagseguro);
 app.use('/api/v1/pagarme', pagarme);

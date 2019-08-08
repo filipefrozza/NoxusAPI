@@ -1,99 +1,81 @@
-var Cliente = require('../models/Cliente');
+var Usuario = require('../models/Usuario');
 var jwt = require('jsonwebtoken');
 var config = require('../config/config');
 var bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
  
-function createToken(cliente) {
-    return jwt.sign({ id: cliente.id, email: cliente.email }, config.jwtSecret, {
+function createToken(usuario) {
+    return jwt.sign({ id: usuario.id, email: usuario.email }, config.jwtSecret, {
         expiresIn: 3600 // 86400 expires in 24 hours
       });
 }
  
 exports.register = (req, res) => {
-    if(req.body.c_senha){
-        delete req.body.c_senha;
-    }
-    if(typeof req.body.disabled != undefined){
-        delete req.body.disabled;
+    if(req.body.admin){
+        delete req.body.admin;
     }
 
-    console.log(req.body);
-
-    if (!req.body.usuario || !req.body.senha) {
-        return res.status(400).json({ 'msg': 'Você deve mandar o usuário e senha' });
-        console.log("você deve mandar o usuario e a senha");
+    if (!req.body.login || !req.body.senha) {
+        return res.status(400).json({ 'msg': 'Você deve mandar o login e senha' });
     }
  
-    Cliente.findOne({ usuario: req.body.usuario }, (err, cliente) => {
+    Usuario.findOne({ usuario: req.body.login }, (err, usuario) => {
         if (err) {
             return res.status(400).json({ 'msg': err });
-            console.log(err);
         }
  
-        if (cliente) {
+        if (usuario) {
             return res.status(400).json({ 'msg': 'O usuário já existe' });
-            console.log("usuario ja existe");
         }
  
-        let newCliente = Cliente(req.body);
-        newCliente.save((err, cliente) => {
+        let newUsuario = Usuario(req.body);
+        newUsuario.save((err, usuario) => {
             if (err) {
                 return res.status(400).json({ 'msg': err });
-                console.log(err);
             }
 
-            cliente.senha = undefined;
-            cliente.resetPasswordExpires = undefined;
-            cliente.resetPasswordToken = undefined;
+            usuario.senha = undefined;
+            usuario.resetPasswordExpires = undefined;
+            usuario.resetPasswordToken = undefined;
 
             return res.status(201).json({
-                token: createToken(cliente),
-                cliente: cliente
+                token: createToken(usuario),
+                usuario: usuario
             });
         });
     });
 };
 
 exports.edit = (req, res) => {
-    if(typeof req.body.disabled != undefined){
-        delete req.body.disabled;
-    }
-
-    // console.log(req.body);
-
     if (!req.body.senha) {
         console.log(req.body);
         return res.status(400).json({ 'msg': 'Você deve preencher a senha' });
-        console.log("você deve preencher a senha");
     }
  
-    Cliente.findOne({ usuario: req.user.usuario }, (err, cliente) => {
+    Usuario.findOne({ usuario: req.user.login }, (err, usuario) => {
         if (err) {
             return res.status(400).json({ 'msg': err });
-            console.log(err);
         }
  
-        if (!cliente) {
+        if (!usuario) {
             return res.status(400).json({ 'msg': 'Erro ao atualizar, relogue para tentar novamente' });
-            console.log("usuario ja existe");
         }
 
-        cliente.comparePassword(req.body.senha, (err, isMatch) => {
-            delete cliente.senha;
+        usuario.comparePassword(req.body.senha, (err, isMatch) => {
+            delete usuario.senha;
             if (isMatch && !err) {
                 for(attr in req.body){
-                    cliente[attr] = req.body[attr];
+                    usuario[attr] = req.body[attr];
                 }
-                console.log(cliente);
-                // let newcliente = cliente(req.body);
-                cliente.save((err, cliente) => {
+                console.log(usuario);
+                // let newUsuario = Usuario(req.body);
+                usuario.save((err, usuario) => {
                     if (err) {
                         return res.status(400).json({ 'msg': err });
                         console.log(err);
                     }
 
-                    delete cliente.senha;
+                    delete usuario.senha;
 
                     return res.status(201).json({
                         'msg': 'Atualizado com sucesso'
@@ -107,30 +89,30 @@ exports.edit = (req, res) => {
 };
  
 exports.login = (req, res) => {
-    if (!req.body.usuario || !req.body.senha) {
-        return res.status(400).send({ 'msg': 'Você deve preencher seu usuário e senha' });
+    if (!req.body.login || !req.body.senha) {
+        return res.status(400).send({ 'msg': 'Você deve preencher seu login e senha' });
     }
  
-    Cliente.findOne({ usuario: req.body.usuario }, (err, cliente) => {
+    Usuario.findOne({ usuario: req.body.login }, (err, usuario) => {
         if (err) {
             return res.status(400).send({ 'msg': err });
         }
  
-        if (!cliente) {
-            return res.status(400).json({ 'msg': 'O usuário não existe' });
+        if (!usuario) {
+            return res.status(400).json({ 'msg': 'O login não existe' });
         }
  
-        cliente.comparePassword(req.body.senha, (err, isMatch) => {
-            cliente.senha = undefined;
-            cliente.resetPasswordExpires = undefined;
-            cliente.resetPasswordToken = undefined;
+        usuario.comparePassword(req.body.senha, (err, isMatch) => {
+            usuario.senha = undefined;
+            usuario.resetPasswordExpires = undefined;
+            usuario.resetPasswordToken = undefined;
             if (isMatch && !err) {
                 return res.status(200).json({
-                    token: createToken(cliente),
-                    cliente: cliente
+                    token: createToken(usuario),
+                    usuario: usuario
                 });
             } else {
-                return res.status(400).json({ 'msg': 'O usuário/senha não bate' });
+                return res.status(400).json({ 'msg': 'O login/senha não bate' });
             }
         });
     });
@@ -142,8 +124,8 @@ exports.forgotPassword = async (req, res) => {
         return res.status(400).send({'msg': 'Você deve preencher o email'});
     }
 
-    await cliente.findOne({email: req.body.email}, async (err, cliente) => {
-        if(!cliente) {
+    await Usuario.findOne({email: req.body.email}, async (err, usuario) => {
+        if(!usuario) {
             console.log('Não existe nenhuma conta com esse email');
             return res.status(400).send({'msg': 'Não existe nenhuma conta com esse email'});
         }
@@ -154,19 +136,19 @@ exports.forgotPassword = async (req, res) => {
             await bcrypt.hash(Date.now()+'', salt, async (err, hash) => {
                 if (err) return console.log(err);
     
-                cliente.resetPasswordToken = hash;
-                console.log('Token '+hash+' gerado para '+cliente.email);
-                cliente.resetPasswordExpires = Date.now() + 1800000; // 30 minutos
+                usuario.resetPasswordToken = hash;
+                console.log('Token '+hash+' gerado para '+usuario.email);
+                usuario.resetPasswordExpires = Date.now() + 1800000; // 30 minutos
 
-                let newCliente = Cliente(cliente);
+                let newUsuario = Usuario(usuario);
 
-                await newCliente.save(async (err, cliente) => {
+                await newUsuario.save(async (err, usuario) => {
                     if (err) {
                         console.log(err);
                         return res.status(400).send({ 'msg': err });
                     }
         
-                    console.log('salvando token para '+cliente.email);
+                    console.log('salvando token para '+usuario.email);
                     var smtpTransport = nodemailer.createTransport({
                         service: 'gmail',
                         auth: {
@@ -176,12 +158,12 @@ exports.forgotPassword = async (req, res) => {
                     });
                     
                     var mailOptions = {
-                        to: cliente.email,
+                        to: usuario.email,
                         from: 'passwordreset@brazilianbet.com',
                         subject: 'Recuperação de senha',
                         text: 'Você está recebendo esse email porque você (ou talvez outra pessoa) solicitou recuperação de senha no site da Brazilian Bet.\n\n' +
                         'Por favor clique no link abaixo ou copie e cole no navegador:\n\n' +
-                        'http://localhost:3000/auth/passwordRecover/' + cliente.resetPasswordToken + '\n\n' +
+                        'http://localhost:3000/auth/passwordRecover/' + usuario.resetPasswordToken + '\n\n' +
                         'Se você não requisitou isso, por favor ignore este email.\n'
                     };
             
@@ -191,7 +173,7 @@ exports.forgotPassword = async (req, res) => {
                             return res.status(400).json({'msg': 'Falha ao enviar email'});
                         }else{
                             console.log("enviando email");
-                            return res.status(201).json({'msg': 'Um email foi enviado para ' + cliente.email + ' com as instruções de recuperação!'});
+                            return res.status(201).json({'msg': 'Um email foi enviado para ' + usuario.email + ' com as instruções de recuperação!'});
                         }
                     }).catch((err) => {
                         console.log(err);
@@ -211,16 +193,16 @@ exports.checkForgotToken = async (req, res) => {
 
     console.log("checkando token "+req.body.token);
 
-    Cliente.findOne({ resetPasswordToken: req.body.token,  resetPasswordExpires: { $gt: Date.now() } }, (err, cliente) => {
+    Usuario.findOne({ resetPasswordToken: req.body.token,  resetPasswordExpires: { $gt: Date.now() } }, (err, usuario) => {
         if (err) {
             return res.status(400).send({ 'msg': err });
         }
  
-        if (!cliente) {
+        if (!usuario) {
             return res.status(400).json({ 'msg': 'Esse token é inválido ou já expirou' });
         }
  
-        return res.status(200).send({'msg': 'Token válido', "cliente": cliente.apelido});
+        return res.status(200).send({'msg': 'Token válido', "usuario": usuario.apelido});
     });
 };
 
@@ -229,26 +211,26 @@ exports.resetForgotPassword = async (req, res) => {
         return res.status(400).json({'msg': 'Você precisa de um token e uma senha para redefinir'});
     }
 
-    Cliente.findOne({ resetPasswordToken: req.body.token,  resetPasswordExpires: { $gt: Date.now() } }, (err, cliente) => {
+    Usuario.findOne({ resetPasswordToken: req.body.token,  resetPasswordExpires: { $gt: Date.now() } }, (err, usuario) => {
         if (err) {
             return res.status(400).send({ 'msg': err });
         }
  
-        if (!cliente) {
+        if (!usuario) {
             return res.status(400).json({ 'msg': 'Esse token é inválido ou já expirou' });
         }
 
-        cliente.senha = req.body.senha;
+        usuario.senha = req.body.senha;
 
-        let newCliente = Cliente(cliente);
+        let newUsuario = Usuario(usuario);
  
-        newCliente.save((err, cliente) => {
+        newUsuario.save((err, usuario) => {
             if (err) {
                 return res.status(400).json({ 'msg': err });
                 console.log(err);
             }
 
-            delete cliente.senha;
+            delete usuario.senha;
 
             return res.status(201).json({
                 
