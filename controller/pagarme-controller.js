@@ -100,8 +100,12 @@ exports.sendTransaction = (transaction, res) => {
     .then(client => {
         client.transactions.create(transaction)
         .then(data => {
-            
             res.json(data);
+            return;
+            var transacao = {
+                
+            };
+            transacaoController.save(transacao, res);
         })
         .catch(e => {
             if(e.response){

@@ -6,6 +6,7 @@ var TransacaoSchema = new mongoose.Schema({
     cliente: mongoose.Schema.ObjectId,
     metodo: String,
     status: String,
+    tid: Number,
     referencia: String,
     plataforma: String,
     cupom: String,

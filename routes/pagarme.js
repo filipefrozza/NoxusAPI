@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var pagarmeController  = require('../controller/pagarme-controller');
+var produtoController = require('../controller/produto-controller');
 var passport     = require('passport');
 
 /* GET home page. */
@@ -19,13 +20,21 @@ router.post('/notificacao', function(req, res, next){
     res.json(retorno);
 });
 
-router.post('/comprar', passport.authenticate('jwt', {session: false}), (req, res) => {
-    pagarmeController.buildTransaction(
-        req.body.items,
-        req.user,
-        req.body.cartao,
-        res
-    );
+router.post('/comprar', passport.authenticate('jwt', {session: false}), async (req, res) => {
+    items = await produtoController.validateItems(req.body.items);
+    if(items.erros){
+        res.status(400).json({"msg": items.erros});
+    }else{
+        console.log('pegou td', items);
+        res.json(items);
+        return;
+        pagarmeController.buildTransaction(
+            req.body.items,
+            req.user,
+            req.body.cartao,
+            res
+        );
+    }
 });
 
 module.exports = router;

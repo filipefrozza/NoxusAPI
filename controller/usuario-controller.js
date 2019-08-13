@@ -19,7 +19,7 @@ exports.register = (req, res) => {
         return res.status(400).json({ 'msg': 'Você deve mandar o login e senha' });
     }
  
-    Usuario.findOne({ usuario: req.body.login }, (err, usuario) => {
+    Usuario.findOne({ login: req.body.login }, (err, usuario) => {
         if (err) {
             return res.status(400).json({ 'msg': err });
         }
@@ -93,7 +93,7 @@ exports.login = (req, res) => {
         return res.status(400).send({ 'msg': 'Você deve preencher seu login e senha' });
     }
  
-    Usuario.findOne({ usuario: req.body.login }, (err, usuario) => {
+    Usuario.findOne({ login: req.body.login }, (err, usuario) => {
         if (err) {
             return res.status(400).send({ 'msg': err });
         }

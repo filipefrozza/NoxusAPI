@@ -55,7 +55,7 @@ routes.post('/check-token', usuarioController.checkForgotToken);
 
 routes.post('/reset', usuarioController.resetForgotPassword);
 
-router.put('/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+routes.put('/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
     if(requireAdmin(req,res)){
         usuarioController.alterar(req,res);
     }
