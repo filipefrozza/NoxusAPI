@@ -4,6 +4,7 @@ var usuarioController  = require('../controller/usuario-controller');
 var passport     = require('passport');
 const path = require("path");
 const multer = require("multer");
+var requireAdmin = require('../middleware/requireAdmin');
 
 const storage = multer.diskStorage({
    destination: "./public/uploads/",
@@ -53,5 +54,13 @@ routes.post('/forgot', usuarioController.forgotPassword);
 routes.post('/check-token', usuarioController.checkForgotToken);
 
 routes.post('/reset', usuarioController.resetForgotPassword);
+
+router.put('/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+    if(requireAdmin(req,res)){
+        usuarioController.alterar(req,res);
+    }
+});
+
+routes.delete('/:id', usuarioController.deletar);
  
 module.exports = routes;

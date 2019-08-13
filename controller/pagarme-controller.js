@@ -1,3 +1,5 @@
+transacaoController = require('./transacao-controller');
+
 exports.buildTransaction = (itens, cliente, cartao, res) => {
     if(!cliente){
         return res.status(400).json({ 'msg': 'Problemas na autenticação' });
@@ -98,7 +100,7 @@ exports.sendTransaction = (transaction, res) => {
     .then(client => {
         client.transactions.create(transaction)
         .then(data => {
-            console.log(data);
+            
             res.json(data);
         })
         .catch(e => {

@@ -238,3 +238,43 @@ exports.resetForgotPassword = async (req, res) => {
         });        
     });
 };
+
+exports.alterar = (req, res) => {
+    if (!req.body.senha) {
+        console.log(req.body);
+        return res.status(400).json({ 'msg': 'Você deve preencher a senha' });
+    }
+ 
+    Usuario.findOne({ usuario: req.params.id }, (err, usuario) => {
+        if (err) {
+            return res.status(400).json({ 'msg': err });
+        }
+ 
+        if (!usuario) {
+            return res.status(400).json({ 'msg': 'Erro ao atualizar, relogue para tentar novamente' });
+        }
+
+        for(attr in req.body){
+            usuario[attr] = req.body[attr];
+        }
+
+        usuario.save((err, usuario) => {
+            if (err) {
+                return res.status(400).json({ 'msg': err });
+            }
+
+            delete usuario.senha;
+
+            return res.status(201).json({
+                'msg': 'Atualizado com sucesso'
+            });
+        });
+    });
+};
+
+exports.deletar = (req, res) => {
+    Usuario.findByIdAndRemove(req.params.id, req.body, function (err, post) {
+        if (err) return res.status(400).json({'msg': err});
+        res.status(200).json({'msg': 'deletado', 'dados': 'post'});
+    });
+};
