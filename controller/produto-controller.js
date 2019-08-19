@@ -41,25 +41,22 @@ Produto.delete = (req, res) => {
 };
 
 Produto.validateItems = async (items) => {
-    let retorno = [];
-    await items.forEach( async (i, k) => {
-        // await Produto.findById(i.id, async (err, produto) => {
-        //     if(err) return retorno.erros?retorno.erros.push(err):retorno.erros=[err];
-        //     if(!produto) return retorno.erros?retorno.erros.push("Produto "+i.id+" não existe"):retorno.erros=["Produto "+i.id+" não existe"];
-        //     produto.quantidade = i.quantidade;
-        //     retorno.push(produto);
-        // });
-        await new Promise(async resolve => {
-            produto = await Produto.findById(i.id);
-            produto.quantidade = i.quantidade;
-            resolve(produto);
+    return new Promise(async resolve => {
+        let ret = [];
+        items.forEach( async (i, k) => {
+            try{
+                produto = await Produto.findById(i.id);
+                produto.quantidade = i.quantidade;
+                if(!produto) return ret.erros?ret.erros.push("Produto "+i.id+" não existe"):ret.erros=["Produto "+i.id+" não existe"];
+                ret.push(produto);
+            }catch(e){
+                ret.erros?ret.erros.push("ID "+i.id+" inválido"):ret.erros=["ID "+i.id+" inválido"];
+            }
+            if(k == items.length - 1){
+                resolve(ret);
+            }
         });
-        if(!produto) return retorno.erros?retorno.erros.push("Produto "+i.id+" não existe"):retorno.erros=["Produto "+i.id+" não existe"];
-        retorno.push(produto);
-        console.log(produto);
     });
-    await setTimeout(() => {}, 300);
-    return retorno;
 };
 
 module.exports = Produto;
