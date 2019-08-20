@@ -21,6 +21,7 @@ var usuario = require('./routes/usuario');
 var produto = require('./routes/produto');
 var pagseguro = require('./routes/pagseguro');
 var pagarme = require('./routes/pagarme');
+var carrinho = require('./routes/carrinho');
 
 var app = express();
 
@@ -58,6 +59,7 @@ app.use('/api/v1/usuario', usuario);
 app.use('/api/v1/produto', produto);
 app.use('/api/v1/pagseguro', pagseguro);
 app.use('/api/v1/pagarme', pagarme);
+app.use('/api/v1/carrinho', carrinho);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
