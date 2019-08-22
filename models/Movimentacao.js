@@ -5,6 +5,8 @@ var MovimentacaoSchema = new mongoose.Schema({
     quantidade: Number,
     data: Date,
     origem: String,
+    valor: Number,
+    confirmado: Boolean,
     updated_at: { type: Date, default: Date.now }
 });
 
