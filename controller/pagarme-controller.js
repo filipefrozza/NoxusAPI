@@ -1,6 +1,6 @@
 transacaoController = require('./transacao-controller');
 
-exports.buildTransaction = (itens, cliente, cartao, res) => {
+exports.buildTransaction = (itens, cliente, cartao, res, req) => {
     if(!cliente){
         return res.status(400).json({ 'msg': 'Problemas na autenticação' });
     }
@@ -92,10 +92,10 @@ exports.buildTransaction = (itens, cliente, cartao, res) => {
 
     console.log(data);
     // res.json(data);
-    exports.sendTransaction(data, res);
+    exports.sendTransaction(data, res, req);
 };
 
-exports.sendTransaction = (transaction, res) => {
+exports.sendTransaction = (transaction, res, req) => {
     pagarmeAPI.client.connect({ api_key: 'ak_test_vyhjh3rc3PbxslGWfg17PgRcdQAzOR' })
     .then(client => {
         client.transactions.create(transaction)
@@ -103,7 +103,17 @@ exports.sendTransaction = (transaction, res) => {
             res.json(data);
             return;
             var transacao = {
-                
+                total: data.amount,
+                items: data.items,
+                cliente: req.user.id,
+                metodo: data.payment_method,
+                status: data.status,
+                tid: data.tid,
+                referencia: null,
+                plataforma: 'pagarme',
+                cupom: null,
+                desconto: 0,
+                boleto: data.boleto_url
             };
             transacaoController.save(transacao, res);
         })
@@ -119,3 +129,22 @@ exports.sendTransaction = (transaction, res) => {
     .then(transactions => console.log(transactions))
     .catch(error => console.log(error))
 }
+
+exports.createCard = (card) => {
+    return new Promise(resolve => {
+        pagarmeAPI.client.connect({api_key: 'ak_test_vyhjh3rc3PbxslGWfg17PgRcdQAzOR'})
+        .then(client => {
+            client.cards.create(card)
+            .then(data => {
+                resolve(data);
+            })
+            .catch(e => {
+                if(e.response){
+                    resolve(e.response.errors);
+                }else{
+                    resolve(e);
+                }
+            })
+        });
+    });
+};
