@@ -148,3 +148,22 @@ exports.createCard = (card) => {
         });
     });
 };
+
+exports.createCustomer = (customer) => {
+    return new Promise(resolve => {
+        pagarmeAPI.client.connect({api_key: 'ak_test_vyhjh3rc3PbxslGWfg17PgRcdQAzOR'})
+        .then(client => {
+            client.customers.create(customer)
+            .then(data => {
+                resolve(data);
+            })
+            .catch(e => {
+                if(e.response){
+                    resolve(e.response.errors);
+                }else{
+                    resolve(e);
+                }
+            });
+        });
+    })
+};

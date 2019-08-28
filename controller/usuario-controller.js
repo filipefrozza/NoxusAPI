@@ -3,6 +3,7 @@ var jwt = require('jsonwebtoken');
 var config = require('../config/config');
 var bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
+var PagarmeController = require('../controller/pagarme-controller');
  
 function createToken(usuario) {
     return jwt.sign({ id: usuario.id, email: usuario.email }, config.jwtSecret, {
@@ -264,9 +265,11 @@ exports.alterar = (req, res) => {
             }
 
             delete usuario.senha;
+            var result = exports.salvarPagarme(usuario);
 
             return res.status(201).json({
-                'msg': 'Atualizado com sucesso'
+                'msg': 'Atualizado com sucesso',
+                'teste': result
             });
         });
     });
@@ -276,5 +279,35 @@ exports.deletar = (req, res) => {
     Usuario.findByIdAndRemove(req.params.id, req.body, function (err, post) {
         if (err) return res.status(400).json({'msg': err});
         res.status(200).json({'msg': 'deletado', 'dados': 'post'});
+    });
+};
+
+/**
+ * customer: {
+ *      name: required,
+ *      email: required,
+ *      external_id: required,
+ *      type: required,
+ *      country: required,
+ *      birthday: opt,
+ *      phone_numbers: required|array,
+ *      documents: required|array
+ * }
+ */
+exports.salvarPagarme = (user) => {
+    let cliente = {
+        name: user.nome,
+        email: user.email,
+        external_id: user.id,
+        type: 'individual',
+        country: 'br',
+        birthday: user.nascimento,
+        phone_numbers: ["+55"+user.telefone.replace(/(\(|\)|\s|\-)/g,'')]
+    };
+    new Promise(async resolve => {
+        customer = await PagarmeController.createCustomer(cliente);
+        console.log(customer);
+        resolve(customer);
+        return;
     });
 };

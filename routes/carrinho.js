@@ -11,6 +11,10 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
     carrinhoController.addProduto(req, res);
 });
 
+router.delete('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+    carrinhoController.limpar(req, res);
+});
+
 router.post('/cupom', passport.authenticate('jwt', {session: false}), (req, res) => {
     carrinhoController.addCupom(req, res);
 });

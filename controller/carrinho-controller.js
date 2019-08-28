@@ -67,4 +67,22 @@ Carrinho.addCupom = (req, res, next) => {
     res.json({});
 };
 
+Carrinho.limpar = (req, res, next) => {
+    return new Promise((resolve) => {
+        try{
+            Carrinho.findOne({cliente: req.user.id}, (err, carrinho) => {
+                if(err) throw err;
+                if(carrinho){
+                    carrinho.remove();
+                    res.status(200).json({});
+                }else{
+                    res.status(404).json({});
+                }
+            });
+        }catch(e){
+            json.status(400).json({'msg': 'Id inválido'});
+        }
+    });
+};
+
 module.exports = Carrinho;
