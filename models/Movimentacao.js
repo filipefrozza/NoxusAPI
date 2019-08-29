@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 
 var MovimentacaoSchema = new mongoose.Schema({
     produto: mongoose.Schema.ObjectId,
+    transacao: mongoose.Schema.ObjectId,
+    cliente: mongoose.Schema.ObjectId,
     quantidade: Number,
     data: Date,
     origem: String,

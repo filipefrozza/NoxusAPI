@@ -27,14 +27,15 @@ router.post('/comprar', passport.authenticate('jwt', {session: false}), async (r
         if(carrinho.items.erros){
             res.status(400).json({"msg": carrinho.items.erros});
         }else{
-            console.log('pegou', carrinho);
-            res.json(carrinho.items);
-            return;
+            // console.log('pegou', carrinho);
+            // res.json(carrinho.items);
+            // return;
             pagarmeController.buildTransaction(
-                req.body.items,
+                carrinho.items,
                 req.user,
                 req.body.cartao,
-                res
+                res,
+                req
             );
         }
     });

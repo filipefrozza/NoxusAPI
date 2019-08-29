@@ -1,12 +1,20 @@
 var Transacao = require('../models/Transacao');
 
 exports.save = (tran, res) => {
-    transacao = new Transacao(tran);
-    transacao.save((err, transacao) => {
-        if(err) {
-            return res.status(400).json({ 'msg': err });
-        }
-        res.status(201).json(transacao);
+    return new Promise(resolve => {
+        transacao = new Transacao(tran);
+        transacao.save((err, transacao) => {
+            if(err) {
+                if(res){
+                    return resolve(false);
+                }
+                return res.status(400).json({ 'msg': err });
+            }
+            if(res){
+                return resolve(transacao.id);
+            }
+            res.status(201).json(transacao);
+        });
     });
 };
 

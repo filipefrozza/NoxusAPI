@@ -1,4 +1,5 @@
 transacaoController = require('./transacao-controller');
+movimentacaoController = require('./movimentacao-controller');
 
 exports.buildTransaction = (itens, cliente, cartao, res, req) => {
     if(!cliente){
@@ -8,7 +9,7 @@ exports.buildTransaction = (itens, cliente, cartao, res, req) => {
     if(!itens){
         return res.status(400).json({ 'msg': 'Você deve informar os itens' });
     }
-
+    
     customer = {
         "external_id": cliente._id,
         "name": cliente.nome,
@@ -17,22 +18,23 @@ exports.buildTransaction = (itens, cliente, cartao, res, req) => {
         "email": cliente.email,
         "documents": [
             {
-            "type": "cpf",
-            "number": cliente.cpf
+                "type": "cpf",
+                "number": cliente.cpf
             }
         ],
         "phone_numbers": ["+55"+cliente.telefone.replace(/(\(|\)|\s|\-)/g,'')],
         "birthday": cliente.nascimento.toISOString().split('T')[0]
     };
-
+    
     items = [];
-
+    
     total = 0;
-
+    
+    itens = JSON.parse(JSON.stringify(itens));
     for(i in itens){
         items.push(
             {
-                "id": itens[i].id,
+                "id": itens[i]._id,
                 "title": itens[i].nome,
                 "unit_price": itens[i].preco*100,
                 "quantity": itens[i].quantidade,
@@ -99,9 +101,7 @@ exports.sendTransaction = (transaction, res, req) => {
     pagarmeAPI.client.connect({ api_key: 'ak_test_vyhjh3rc3PbxslGWfg17PgRcdQAzOR' })
     .then(client => {
         client.transactions.create(transaction)
-        .then(data => {
-            res.json(data);
-            return;
+        .then(async data => {
             var transacao = {
                 total: data.amount,
                 items: data.items,
@@ -115,7 +115,28 @@ exports.sendTransaction = (transaction, res, req) => {
                 desconto: 0,
                 boleto: data.boleto_url
             };
-            transacaoController.save(transacao, res);
+            var trans_id = await transacaoController.save(transacao, res);
+            if(trans_id){
+                var movimentacoes = [];
+                for(i in data.items){
+                    movimentacoes.push({
+                        produto: data.items[i].id,
+                        transacao: trans_id,
+                        quantidade: data.items[i].quantity,
+                        data: Date.now(),
+                        origem: 'compra',
+                        valor: data.items[i].unit_price,
+                        confirmado: data.payment_method == 'credit_card'
+                    });
+                }
+                
+                for(i in movimentacoes){
+                    movimentacaoController.save(movimentacoes[i]);
+                }
+                res.status(201).json(transacao);
+            }else{
+                res.status(400).json(transacao);
+            }
         })
         .catch(e => {
             if(e.response){

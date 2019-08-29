@@ -14,6 +14,7 @@ var ProdutoSchema = new mongoose.Schema({
     descricao: String,
     habilitado: Boolean,
     destaque: Boolean,
+    fisico: Boolean,
     updated_at: { type: Date, default: Date.now },
 });
 
