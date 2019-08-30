@@ -7,14 +7,32 @@ var ProdutoSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    categorias: {
+        type: Array
+    },
     img: String,
-    peso: Number,
-    preco: Number,
-    estoque: Number,
+    peso: {
+        type: Number,
+        required: true
+    },
+    preco: {
+        type: Number,
+        required: true
+    },
+    estoque: {
+        type: Number,
+        required: true
+    },
     descricao: String,
-    habilitado: Boolean,
+    habilitado: {
+        type: Boolean,
+        required: true
+    }, 
     destaque: Boolean,
-    fisico: Boolean,
+    fisico: {
+        type: Boolean,
+        required: true
+    },
     updated_at: { type: Date, default: Date.now },
 });
 

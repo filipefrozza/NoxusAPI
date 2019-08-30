@@ -1,5 +1,6 @@
 transacaoController = require('./transacao-controller');
 movimentacaoController = require('./movimentacao-controller');
+carrinhoController = require('./carrinho-controller');
 
 exports.buildTransaction = (itens, cliente, cartao, res, req) => {
     if(!cliente){
@@ -92,8 +93,6 @@ exports.buildTransaction = (itens, cliente, cartao, res, req) => {
         };
     }
 
-    console.log(data);
-    // res.json(data);
     exports.sendTransaction(data, res, req);
 };
 
@@ -102,8 +101,29 @@ exports.sendTransaction = (transaction, res, req) => {
     .then(client => {
         client.transactions.create(transaction)
         .then(async data => {
+            carrinhoController.findOne({cliente: req.user.id}, (err, carrinho) => {
+                if(err) console.log(err);
+                if(carrinho) {
+                    carrinho.remove();
+                }
+            });
+            
+            var movimentacoes = [];
+            for(i in data.items){
+                data.items[i].unit_price/=100;
+                movimentacoes.push({
+                    produto: data.items[i].id,
+                    transacao: trans_id,
+                    quantidade: data.items[i].quantity,
+                    data: Date.now(),
+                    origem: 'compra',
+                    valor: data.items[i].unit_price,
+                    confirmado: data.payment_method == 'credit_card'
+                });
+            }
+
             var transacao = {
-                total: data.amount,
+                total: data.amount/100,
                 items: data.items,
                 cliente: req.user.id,
                 metodo: data.payment_method,
@@ -117,19 +137,6 @@ exports.sendTransaction = (transaction, res, req) => {
             };
             var trans_id = await transacaoController.save(transacao, res);
             if(trans_id){
-                var movimentacoes = [];
-                for(i in data.items){
-                    movimentacoes.push({
-                        produto: data.items[i].id,
-                        transacao: trans_id,
-                        quantidade: data.items[i].quantity,
-                        data: Date.now(),
-                        origem: 'compra',
-                        valor: data.items[i].unit_price,
-                        confirmado: data.payment_method == 'credit_card'
-                    });
-                }
-                
                 for(i in movimentacoes){
                     movimentacaoController.save(movimentacoes[i]);
                 }

@@ -23,20 +23,24 @@ router.post('/notificacao', function(req, res, next){
 
 router.post('/comprar', passport.authenticate('jwt', {session: false}), async (req, res) => {
     carrinhoController.getByCliente(req).then( async(carrinho) => {
-        carrinho.items = await produtoController.validateItems(carrinho.items);
-        if(carrinho.items.erros){
-            res.status(400).json({"msg": carrinho.items.erros});
+        if(carrinho){
+            carrinho.items = await produtoController.validateItems(carrinho.items);
+            if(carrinho.items.erros){
+                res.status(400).json({"msg": carrinho.items.erros});
+            }else{
+                // console.log('pegou', carrinho);
+                // res.json(carrinho.items);
+                // return;
+                pagarmeController.buildTransaction(
+                    carrinho.items,
+                    req.user,
+                    req.body.cartao,
+                    res,
+                    req
+                );
+            }
         }else{
-            // console.log('pegou', carrinho);
-            // res.json(carrinho.items);
-            // return;
-            pagarmeController.buildTransaction(
-                carrinho.items,
-                req.user,
-                req.body.cartao,
-                res,
-                req
-            );
+            res.status(400).json({"msg": "Você não possui itens no seu carrinho"});
         }
     });
 
