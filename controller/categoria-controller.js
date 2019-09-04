@@ -45,3 +45,5 @@ Categoria.getById = (req, res) => {
         }
     });
 };
+
+module.exports = Categoria;

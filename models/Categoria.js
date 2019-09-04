@@ -14,11 +14,21 @@ var CategoriaSchema = mongoose.Schema({
         trim: true,
         lowercase: true
     },
+    img: {
+        type: String,
+        required: true
+    },
     ordem: {
-        type: Number
+        type: Number,
+        default: null
     },
     destaque: {
-        type: Boolean
+        type: Boolean,
+        default: false
+    },
+    relevancia: {
+        type: Number,
+        default: 0
     },
     updated_at: { type: Date, default: Date.now }
 });

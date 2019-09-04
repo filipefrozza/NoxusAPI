@@ -33,6 +33,10 @@ var ProdutoSchema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
+    relevancia: {
+        type: Number,
+        default: 0
+    },
     updated_at: { type: Date, default: Date.now },
 });
 
