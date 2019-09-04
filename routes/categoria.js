@@ -12,4 +12,8 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
     }
 });
 
+router.get('/destaques', (req, res) => {
+    categoriaController.getByFlag('destaques', true, req, res);
+});
+
 module.exports = router;

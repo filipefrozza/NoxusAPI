@@ -52,5 +52,22 @@ module.exports = (model) => {
         });
     };
 
+    model.getByFlag = (flag, val, req, res) => {
+        let search = [];
+        search[flag] = val;
+        model.find(search, (err, objetos) => {
+            if(err) res.status(400).json(err);
+            if(objetos){
+                res.json(objetos);
+            }else{
+                res.status(404).json({msg: "Não foram encontrados registros"})
+            }
+        });
+    };
+
+    model.getByRelevancia = (req, res) => {
+        //to-do
+    };
+
     return model;
 };
