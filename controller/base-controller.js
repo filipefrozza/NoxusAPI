@@ -1,11 +1,15 @@
 module.exports = (model) => {
     model.save = (req, res) => {
+        console.log('entrou save');
         var objeto = new model(req.body);
         objeto.save((err, objeto) => {
+            console.log('entrou save object');
             if(err) res.status(400).json(err);
             if(objeto){
+                console.log('entrou é objeto');
                 res.status(201).json(objeto);
             }else{
+                console.log('entrou 404');
                 res.status(400).json({msg: "Não foi possível salvar"});
             }
         });
@@ -66,7 +70,14 @@ module.exports = (model) => {
     };
 
     model.getByRelevancia = (req, res) => {
-        //to-do
+        model.find({}).sort({relevancia: -1}).limit(3).exec((err, objetos) => {
+            if(err) res.status(400).json(err);
+            if(objetos) {
+                res.json(objetos);
+            }else{
+                res.status(404).json({msg: "Não foram encontrados registros"});
+            }
+        });
     };
 
     return model;

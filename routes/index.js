@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'API BrazilianBet' });
+  res.render('index', { title: 'Noxus API' });
 });
 
 router.get('/webhook', function(res, res, nex){
