@@ -8,6 +8,17 @@ Produto.getDestaques = function(req, res, next){
     });
 }
 
+Produto.getPromocao = (req, res) => {
+    Produto.find({promocao: {$ne: null}}, (err, produtos) => {
+        if(err) res.status(400).json(err);
+        if(produtos) {
+            res.json(produtos);
+        }else{
+            res.status(404).json({msg: "Não há registros em promoção"});
+        }
+    });
+};
+
 Produto.validateItems = async (items) => {
     return new Promise(async resolve => {
         let ret = [];

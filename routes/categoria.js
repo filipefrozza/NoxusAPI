@@ -7,7 +7,9 @@ var requireAdmin = require('../middleware/requireAdmin');
 router.get('/', categoriaController.getAll);
 
 router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+    console.log('entrou post');
     if(requireAdmin(req, res)){
+        console.log('entrou admin');
         categoriaController.save(req, res);
     }
 });

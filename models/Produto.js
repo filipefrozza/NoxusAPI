@@ -7,6 +7,12 @@ var ProdutoSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    url: {
+        type: String,
+        unique: true,
+        required: true,
+        trim: true
+    },
     categorias: {
         type: Array
     },
@@ -36,6 +42,10 @@ var ProdutoSchema = new mongoose.Schema({
     relevancia: {
         type: Number,
         default: 0
+    },
+    promocao: {
+        type: Object,
+        default: null
     },
     updated_at: { type: Date, default: Date.now },
 });
