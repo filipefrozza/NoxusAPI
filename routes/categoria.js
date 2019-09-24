@@ -16,4 +16,8 @@ router.get('/destaques', (req, res) => {
     categoriaController.getByFlag('destaques', true, req, res);
 });
 
+router.get('/relevante', (req, res) => {
+    categoriaController.getByRelevancia(req, res);
+});
+
 module.exports = router;

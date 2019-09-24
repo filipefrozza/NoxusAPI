@@ -66,7 +66,14 @@ module.exports = (model) => {
     };
 
     model.getByRelevancia = (req, res) => {
-        //to-do
+        model.find({},[],{skip: 0, limit: 10, sort: {relevancia: -1}}, (err, objetos) => {
+            if(err) res.status(400).json(err);
+            if(objetos){
+                res.json(objetos);
+            }else{
+                res.status(404).json({msg: "Não foram encontrados registros"})
+            }
+        });
     };
 
     return model;

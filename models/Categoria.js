@@ -30,7 +30,30 @@ var CategoriaSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    acessos: {
+        type: Number,
+        default: 0
+    },
+    textColor: {
+        type: String,
+        default: 'black',
+        lowercase: true,
+        trim: true
+    },
     updated_at: { type: Date, default: Date.now }
+});
+
+CategoriaSchema.pre('save', next => {
+    var categoria = this;
+    if(!categoria.ordem){
+        CategoriaSchema.find({}).sort({ordem: -1}).limit(1).exec((err, ultima) => {
+            if(err) next(err);
+            categoria.ordem = ultima.ordem+1;
+            next();
+        });
+    }else{
+        next();
+    }
 });
 
 module.exports = mongoose.model('categoria', CategoriaSchema);
