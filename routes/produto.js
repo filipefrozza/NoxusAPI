@@ -14,6 +14,8 @@ router.get('/', function (req, res, next) {
 
 router.get('/destaques', produtoController.getDestaques);
 
+router.get('/relevante', produtoController.getByRelevancia);
+
 router.get('/promocao', produtoController.getPromocao);
 
 router.get('/:id', function (req, res, next) {
