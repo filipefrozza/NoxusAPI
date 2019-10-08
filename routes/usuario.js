@@ -18,8 +18,14 @@ const upload = multer({
    limits:{fileSize: 1000000},
 }).single("myImage");
  
-routes.get('/', (req, res) => {
-    return res.send('[]');
+// routes.get('/', (req, res) => {
+//     return res.send('[]');
+// });
+
+routes.get('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+    if(requireAdmin(req,res)){
+        usuarioController.getAll(req,res);
+    }
 });
  
 routes.post('/register', usuarioController.register);
