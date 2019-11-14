@@ -154,7 +154,7 @@ exports.forgotPassword = async (req, res) => {
                         service: 'gmail',
                         auth: {
                             user: 'frozzateste@gmail.com',
-                            pass: '#teste123'
+                            pass: 'ohvoatvlxjpiutln'
                         }
                     });
                     
@@ -203,7 +203,7 @@ exports.checkForgotToken = async (req, res) => {
             return res.status(400).json({ 'msg': 'Esse token é inválido ou já expirou' });
         }
  
-        return res.status(200).send({'msg': 'Token válido', "usuario": usuario.apelido});
+        return res.status(200).send({'msg': 'Token válido', "apelido": usuario.apelido});
     });
 };
 
@@ -309,5 +309,16 @@ exports.salvarPagarme = (user) => {
         console.log(customer);
         resolve(customer);
         return;
+    });
+};
+
+exports.getAll = (req, res) => {
+    Usuario.find({}, (err, objeto) => {
+        if(err) res.status(400).json(err);
+        if(objeto){
+            res.json(objeto);
+        }else{
+            res.status(404).json({msg: "Não foram encontrados registros"});
+        }
     });
 };
