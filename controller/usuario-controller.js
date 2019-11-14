@@ -49,11 +49,10 @@ exports.register = (req, res) => {
 
 exports.edit = (req, res) => {
     if (!req.body.senha) {
-        console.log(req.body);
         return res.status(400).json({ 'msg': 'Você deve preencher a senha' });
     }
  
-    Usuario.findOne({ usuario: req.user.login }, (err, usuario) => {
+    Usuario.findOne({ login: req.user.login }, (err, usuario) => {
         if (err) {
             return res.status(400).json({ 'msg': err });
         }
@@ -68,7 +67,6 @@ exports.edit = (req, res) => {
                 for(attr in req.body){
                     usuario[attr] = req.body[attr];
                 }
-                console.log(usuario);
                 // let newUsuario = Usuario(req.body);
                 usuario.save((err, usuario) => {
                     if (err) {
